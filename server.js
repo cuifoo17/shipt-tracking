@@ -6,12 +6,6 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Connect to MongoDB
-const mongoUrl = process.env.MONGO_URL || process.env.MONGODB_URL || 'mongodb://localhost:27017/shipt-tracking';
-mongoose.connect(mongoUrl)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
 // Order Schema
 const orderSchema = new mongoose.Schema({
     timestamp: { type: Date, required: true },
@@ -26,6 +20,11 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', mongo: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
+});
 
 // Save a new order
 app.post('/api/save-order', async (req, res) => {
@@ -115,8 +114,16 @@ function formatDuration(seconds) {
     return `${hrs}h ${mins}m ${secs}s`;
 }
 
-// Start server
+// Start server first, then connect to MongoDB
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Shipt Tracker running on port ${PORT}`);
+
+    // Connect to MongoDB after server starts
+    const mongoUrl = process.env.MONGO_URL || process.env.MONGODB_URL || 'mongodb://localhost:27017/shipt-tracking';
+    console.log('Connecting to MongoDB...');
+
+    mongoose.connect(mongoUrl)
+        .then(() => console.log('Connected to MongoDB'))
+        .catch(err => console.error('MongoDB connection error:', err.message));
 });
