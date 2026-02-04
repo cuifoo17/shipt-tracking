@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipt Delivery Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Burger Menu */
+        .burger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .burger-menu:hover {
+            transform: scale(1.05);
+        }
+
+        .burger-line {
+            width: 25px;
+            height: 3px;
+            background: #667eea;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            z-index: 999;
+            transition: left 0.3s ease;
+            padding-top: 80px;
+        }
+
+        .side-menu.open {
+            left: 0;
+        }
+
+        .menu-item {
+            padding: 20px 30px;
+            font-size: 18px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: #f8f9fa;
+            border-left-color: #667eea;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            padding: 30px;
+            padding-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Order Counter */
+        .order-counter {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .counter-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .counter-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .counter-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .counter-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .counter-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .counter-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        /* Timer Display */
+        .timer-display {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .timer-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Status Display */
+        .status-display {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .status-subtext {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Buttons */
+        button.action-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(235, 51, 73, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-cancel {
+            background: #ff4444;
+            color: white;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-confirm {
+            background: #11998e;
+            color: white;
+        }
+
+        .modal-btn-confirm:hover {
+            background: #0d7a6f;
+            transform: translateY(-2px);
+        }
+
+        .placeholder-page {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .placeholder-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .placeholder-text {
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        /* Compact History Item */
+        .history-item-compact {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .history-item-compact {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.history-item-compact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+        .delete-btn-compact {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #ff4444;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn-compact:hover {
+            background: #cc0000;
+            transform: scale(1.1);
+        }
+
+        .compact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-right: 35px;
+        }
+
+        .compact-order-info {
+            font-size: 15px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .compact-date {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .compact-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .compact-stat-box {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .compact-stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .compact-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .compact-stat-value.too-long {
+            font-size: 13px;
+            color: #ff4444;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <div class="burger-menu" onclick="toggleMenu()">
+        <div class="burger-line"></div>
+        <div class="burger-line"></div>
+        <div class="burger-line"></div>
+    </div>
+
+    <!-- Overlay (click to close menu) -->
+    <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-item active" onclick="showPage('shop')">
+            🛒 Shop
+        </div>
+        <div class="menu-item" onclick="showPage('history')">
+            📊 Past Orders
+        </div>
+        <div class="menu-item" onclick="showPage('stats')">
+            📈 Stats
+        </div>
+        <div class="menu-item" onclick="showPage('map')">
+            🗺️ Map
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-title">Delete Order?</div>
+            <div class="modal-text">Are you sure you want to delete this order? This action cannot be undone.</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmDelete()">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Shop Page -->
+        <div class="page active" id="shopPage">
+            <h1>🚗 Shipt Tracker</h1>
+
+            <!-- Order Counter -->
+            <div class="order-counter" id="orderCounter">
+                <div class="counter-label">Number of Orders</div>
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="changeOrderCount(-1)" id="decreaseBtn">−</button>
+                    <div class="counter-value" id="orderCount">1</div>
+                    <button class="counter-btn" onclick="changeOrderCount(1)" id="increaseBtn">+</button>
+                </div>
+            </div>
+
+            <!-- Current Timer Display -->
+            <div class="timer-display">
+                <div class="timer-label" id="timerLabel">Ready to Start</div>
+                <div class="timer-value" id="timerValue">00:00:00</div>
+            </div>
+
+            <!-- Status Display (hidden initially) -->
+            <div class="status-display hidden" id="statusDisplay">
+                <div class="status-text" id="statusText"></div>
+                <div class="status-subtext" id="statusSubtext"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div id="actionButtons">
+                <button class="action-btn btn-primary" onclick="startHeadingToStore()" id="headToStoreBtn">
+                    🚗 Head to Store
+                </button>
+            </div>
+        </div>
+
+        <!-- Past Orders Page -->
+        <div class="page" id="historyPage">
+            <h1>📊 Past Orders</h1>
+            <div id="historyList">
+                <div class="empty-history">No trips completed yet</div>
+            </div>
+        </div>
+
+        <!-- Stats Page -->
+<div class="page" id="statsPage">
+    <h1>📈 Stats</h1>
+    
+    <!-- Time Period Selector -->
+    <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+        <label style="display: block; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; text-align: center;">
+            Time Period
+        </label>
+        <select id="statsPeriod" onchange="updateStats()" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; font-weight: bold; color: #333; background: white; cursor: pointer;">
+    <option value="today">Today</option>
+    <option value="yesterday">Yesterday</option>
+    <option value="thisWeek">This Week</option>
+    <option value="thisMonth">This Month</option>
+    <option value="allTime">All Time</option>
+    <option value="custom">Custom</option>
+</select>
+    </div>
+    
+    <!-- Stats Content -->
+    <div id="statsContent">
+        <div class="placeholder-page">
+            <div class="placeholder-icon">📊</div>
+            <div class="placeholder-text">Select a time period above</div>
+        </div>
+    </div>
+</div>
+
+        <!-- Map Page -->
+        <div class="page" id="mapPage">
+            <h1>🗺️ Map</h1>
+            <div class="placeholder-page">
+                <div class="placeholder-icon">🗺️</div>
+                <div class="placeholder-text">Coming soon...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tripState = {
+            phase: 'idle',
+            orderCount: 1,
+            startTime: null,
+            headingStartTime: null,
+            shoppingStartTime: null,
+            deliveringStartTime: null,
+            currentDelivery: 0,
+            deliveryTimes: [],
+            durations: {
+                heading: 0,
+                shopping: 0,
+                delivering: 0,
+                total: 0
+            }
+        };
+
+        let timerInterval = null;
+        let tripHistory = [];
+        let deleteIndex = null;
+
+        // Menu functions
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('overlay');
+            menu.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function closeMenu() {
+            document.getElementById('sideMenu').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            const pages = {
+                'shop': { element: 'shopPage', menuIndex: 0 },
+                'history': { element: 'historyPage', menuIndex: 1 },
+                'stats': { element: 'statsPage', menuIndex: 2 },
+                'map': { element: 'mapPage', menuIndex: 3 }
+            };
+
+            if (pages[pageName]) {
+                document.getElementById(pages[pageName].element).classList.add('active');
+                document.querySelectorAll('.menu-item')[pages[pageName].menuIndex].classList.add('active');
+                
+                if (pageName === 'history') {
+                    displayHistory();
+                }
+            }
+
+            closeMenu();
+        }
+
+        // Delete modal functions
+        function showDeleteModal(index) {
+            deleteIndex = index;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            deleteIndex = null;
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        function confirmDelete() {
+    if (deleteIndex !== null) {
+        fetch('/api/delete-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index: deleteIndex })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.orders) {
+                // Update local history from server
+                tripHistory = data.orders.map(trip => ({
+                    ...trip,
+                    timestamp: new Date(trip.timestamp)
+                }));
+                displayHistory();
+                closeDeleteModal();
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting order:', error);
+            alert('Failed to delete order');
+        });
+    }
+}
+
+        // Order counter functions
+        function changeOrderCount(delta) {
+            const newCount = tripState.orderCount + delta;
+            if (newCount >= 1 && newCount <= 6) {
+                tripState.orderCount = newCount;
+                document.getElementById('orderCount').textContent = newCount;
+            }
+        }
+
+        // Phase 1: Head to Store
+        function startHeadingToStore() {
+            tripState.phase = 'heading';
+            tripState.startTime = new Date();
+            tripState.headingStartTime = new Date();
+
+            document.getElementById('timerLabel').textContent = 'Heading to Store';
+            document.getElementById('actionButtons').innerHTML = `
+                <button class="action-btn btn-success" onclick="startShopping()">
+                    🛒 Start Shopping
+                </button>
+            `;
+
+            startTimer();
+        }
+
+        // Phase 2: Shopping
+        function startShopping() {
+            const now = new Date();
+            tripState.phase = 'shopping';
+            tripState.durations.heading = Math.floor((now - tripState.headingStartTime) / 1000);
+            tripState.shoppingStartTime = now;
+
+            document.getElementById('timerLabel').textContent = `Shopping for ${tripState.orderCount} Order${tripState.orderCount > 1 ? 's' : ''}`;
+            document.getElementById('actionButtons').innerHTML = `
+                <button class="action-btn btn-success" onclick="completeShopping()">
+                    ✅ Shopping Complete
+                </button>
+            `;
+
+            resetTimer();
+        }
+
+        // Phase 3: Start Deliveries
+        function completeShopping() {
+            const now = new Date();
+            tripState.phase = 'delivering';
+            tripState.durations.shopping = Math.floor((now - tripState.shoppingStartTime) / 1000);
+            tripState.deliveringStartTime = now;
+            tripState.currentDelivery = 1;
+
+            document.getElementById('decreaseBtn').disabled = true;
+            document.getElementById('increaseBtn').disabled = true;
+
+            updateDeliveryUI();
+            resetTimer();
+        }
+
+        // Delivery tracking
+        function updateDeliveryUI() {
+            const deliveryNum = tripState.currentDelivery;
+            const totalOrders = tripState.orderCount;
+
+            document.getElementById('timerLabel').textContent = `Delivery ${deliveryNum} of ${totalOrders}`;
+            
+            document.getElementById('statusDisplay').classList.remove('hidden');
+            document.getElementById('statusText').textContent = `Delivery ${deliveryNum} in Progress`;
+            document.getElementById('statusSubtext').textContent = `${totalOrders - deliveryNum} remaining`;
+
+            document.getElementById('actionButtons').innerHTML = `
+                <button class="action-btn btn-success" onclick="completeDelivery()">
+                    ✅ Delivery ${deliveryNum} Complete
+                </button>
+            `;
+        }
+
+        function completeDelivery() {
+            const now = new Date();
+            tripState.deliveryTimes.push(now);
+            tripState.currentDelivery++;
+
+            if (tripState.currentDelivery <= tripState.orderCount) {
+                updateDeliveryUI();
+                resetTimer();
+            } else {
+                completeTrip();
+            }
+        }
+
+        // Complete entire trip
+function completeTrip() {
+    const now = new Date();
+    tripState.durations.delivering = Math.floor((now - tripState.deliveringStartTime) / 1000);
+    tripState.durations.total = Math.floor((now - tripState.startTime) / 1000);
+
+    stopTimer();
+
+    // Calculate individual delivery times from the deliveryTimes array
+    const individualDeliveryDurations = [];
+    let previousTime = tripState.deliveringStartTime;
+    
+    for (let i = 0; i < tripState.deliveryTimes.length; i++) {
+        const deliveryDuration = Math.floor((tripState.deliveryTimes[i] - previousTime) / 1000);
+        individualDeliveryDurations.push(deliveryDuration);
+        previousTime = tripState.deliveryTimes[i];
+    }
+
+    const trip = {
+        timestamp: now,
+        orderCount: tripState.orderCount,
+        durations: { ...tripState.durations },
+        individualDeliveries: individualDeliveryDurations  // NEW: Store individual delivery times
+    };
+
+    fetch('/api/save-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(trip)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Trip saved:', data);
+        tripHistory.unshift(trip);
+        displayHistory();
+        resetTrip();
+    })
+    .catch(error => {
+        console.error('Error saving trip:', error);
+        alert('Failed to save trip. Please try again.');
+    });
+}
+
+        // Timer functions
+        function startTimer() {
+            stopTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        function updateTimer() {
+            let startTime;
+            if (tripState.phase === 'heading') {
+                startTime = tripState.headingStartTime;
+            } else if (tripState.phase === 'shopping') {
+                startTime = tripState.shoppingStartTime;
+            } else if (tripState.phase === 'delivering') {
+                startTime = tripState.deliveringStartTime;
+            }
+
+            if (startTime) {
+                const elapsed = Math.floor((new Date() - startTime) / 1000);
+                document.getElementById('timerValue').textContent = formatDuration(elapsed);
+            }
+        }
+
+        function resetTimer() {
+            document.getElementById('timerValue').textContent = '00:00:00';
+            startTimer();
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // Helper: Format duration for timer (HH:MM:SS)
+        function formatDuration(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Reset for new trip
+        function resetTrip() {
+            tripState = {
+                phase: 'idle',
+                orderCount: 1,
+                startTime: null,
+                headingStartTime: null,
+                shoppingStartTime: null,
+                deliveringStartTime: null,
+                currentDelivery: 0,
+                deliveryTimes: [],
+                durations: {
+                    heading: 0,
+                    shopping: 0,
+                    delivering: 0,
+                    total: 0
+                }
+            };
+
+            document.getElementById('orderCount').textContent = '1';
+            document.getElementById('decreaseBtn').disabled = false;
+            document.getElementById('increaseBtn').disabled = false;
+            document.getElementById('timerLabel').textContent = 'Ready to Start';
+            document.getElementById('timerValue').textContent = '00:00:00';
+            document.getElementById('statusDisplay').classList.add('hidden');
+            document.getElementById('actionButtons').innerHTML = `
+                <button class="action-btn btn-primary" onclick="startHeadingToStore()">
+                    🚗 Head to Store
+                </button>
+            `;
+        }
+
+        // Display history
+        // Display history
+function displayHistory() {
+    const historyList = document.getElementById('historyList');
+    
+    if (tripHistory.length === 0) {
+        historyList.innerHTML = '<div class="empty-history">No trips completed yet</div>';
+        return;
+    }
+
+    historyList.innerHTML = tripHistory.map((trip, index) => {
+        const totalMinutes = Math.floor(trip.durations.total / 60);
+        const totalTimeDisplay = formatTimeDisplay(trip.durations.total);
+        
+        return `
+            <div class="history-item-compact" onclick="showOrderDetail(${index})">
+                <button class="delete-btn-compact" onclick="event.stopPropagation(); showDeleteModal(${index})">🗑️</button>
+                
+                <div class="compact-header">
+                    <div class="compact-order-info">
+                        Order #${tripHistory.length - index} • ${trip.orderCount} Order${trip.orderCount > 1 ? 's' : ''}
+                    </div>
+                    <div class="compact-date">
+                        ${formatCompactDate(trip.timestamp)}
+                    </div>
+                </div>
+                
+                <div class="compact-stats">
+                    <div class="compact-stat-box">
+                        <div class="compact-stat-label">Orders</div>
+                        <div class="compact-stat-value">${trip.orderCount}</div>
+                    </div>
+                    <div class="compact-stat-box">
+                        <div class="compact-stat-label">Total Time</div>
+                        <div class="compact-stat-value ${totalMinutes > 360 ? 'too-long' : ''}">${totalTimeDisplay}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+// Show order detail
+function showOrderDetail(index) {
+    const trip = tripHistory[index];
+    const orderNumber = tripHistory.length - index;
+    const totalSeconds = trip.durations.total;
+    
+    // Calculate percentages
+    const headingPercent = (trip.durations.heading / totalSeconds) * 100;
+    const shoppingPercent = (trip.durations.shopping / totalSeconds) * 100;
+    const deliveringPercent = (trip.durations.delivering / totalSeconds) * 100;
+    
+    // Calculate per-delivery time (approximate)
+    const timePerDelivery = trip.durations.delivering / trip.orderCount;
+    
+    // Build the visual bar segments
+    let barSegments = `
+        <div id="segment-heading" 
+             onclick="highlightSegment('heading')"
+             style="background: #667eea; width: ${headingPercent}%; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">
+            ${headingPercent > 10 ? 'Driving' : ''}
+        </div>
+        <div id="segment-shopping" 
+             onclick="highlightSegment('shopping')"
+             style="background: #11998e; width: ${shoppingPercent}%; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">
+            ${shoppingPercent > 10 ? 'Shopping' : ''}
+        </div>
+    `;
+    
+    // Add individual delivery segments
+const deliveryColors = ['#f45c43', '#ff6b6b', '#ff8787', '#ffa5a5', '#ffc1c1', '#ffd4d4'];
+
+for (let i = 0; i < trip.orderCount; i++) {
+    const color = deliveryColors[i % deliveryColors.length];
+    
+    // Use actual individual delivery time if available
+    const actualDeliveryTime = trip.individualDeliveries && trip.individualDeliveries[i] 
+        ? trip.individualDeliveries[i] 
+        : Math.floor(timePerDelivery);
+    
+    const thisDeliveryPercent = (actualDeliveryTime / totalSeconds) * 100;
+    
+    barSegments += `
+        <div id="segment-delivery-${i}" 
+             onclick="highlightSegment('delivery-${i}')"
+             style="background: ${color}; width: ${thisDeliveryPercent}%; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">
+            ${thisDeliveryPercent > 8 ? `D${i + 1}` : ''}
+        </div>
+    `;
+}
+    
+    // Build breakdown list
+    let breakdownItems = `
+        <div id="breakdown-heading" 
+             onclick="highlightSegment('heading')"
+             style="background: white; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: #667eea; border-radius: 3px;"></div>
+                <span style="font-weight: bold; color: #333;">Driving to Store</span>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <span style="color: #666;">${formatTimeDisplay(trip.durations.heading)}</span>
+                <span style="color: #667eea; font-weight: bold; min-width: 45px; text-align: right;">${headingPercent.toFixed(1)}%</span>
+            </div>
+        </div>
+        
+        <div id="breakdown-shopping" 
+             onclick="highlightSegment('shopping')"
+             style="background: white; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: #11998e; border-radius: 3px;"></div>
+                <span style="font-weight: bold; color: #333;">Shopping</span>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <span style="color: #666;">${formatTimeDisplay(trip.durations.shopping)}</span>
+                <span style="color: #11998e; font-weight: bold; min-width: 45px; text-align: right;">${shoppingPercent.toFixed(1)}%</span>
+            </div>
+        </div>
+    `;
+    
+    // Add individual delivery breakdown items
+for (let i = 0; i < trip.orderCount; i++) {
+    const color = deliveryColors[i % deliveryColors.length];
+    
+    // Use actual individual delivery time if available, otherwise fall back to average
+    const actualDeliveryTime = trip.individualDeliveries && trip.individualDeliveries[i] 
+        ? trip.individualDeliveries[i] 
+        : Math.floor(timePerDelivery);
+    
+    const deliveryPercent = (actualDeliveryTime / totalSeconds) * 100;
+    
+    breakdownItems += `
+        <div id="breakdown-delivery-${i}" 
+             onclick="highlightSegment('delivery-${i}')"
+             style="background: white; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: ${color}; border-radius: 3px;"></div>
+                <span style="font-weight: bold; color: #333;">Delivery ${i + 1}</span>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <span style="color: #666;">${formatTimeDisplay(actualDeliveryTime)}</span>
+                <span style="color: ${color}; font-weight: bold; min-width: 45px; text-align: right;">${deliveryPercent.toFixed(1)}%</span>
+            </div>
+        </div>
+    `;
+}
+    
+    const detailHTML = `
+    <div style="padding: 20px 0;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 16px; font-weight: bold; color: #667eea; margin-bottom: 10px;">
+                Order #${orderNumber} • ${trip.orderCount} Order${trip.orderCount > 1 ? 's' : ''}
+            </div>
+            <div style="font-size: 36px; font-weight: bold; color: #333; margin-bottom: 10px;">
+                ${formatTimeDisplay(totalSeconds)}
+            </div>
+            <div style="font-size: 14px; color: #666;">
+                ${formatDetailDate(new Date(trip.timestamp.getTime() - (totalSeconds * 1000)))} - ${formatDetailDate(trip.timestamp)}
+            </div>
+        </div>
+            
+            <!-- Interactive Chart -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <div style="display: flex; height: 60px; border-radius: 8px; overflow: hidden; margin-bottom: 20px; cursor: pointer;">
+                    ${barSegments}
+                </div>
+                
+                <!-- Breakdown List -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${breakdownItems}
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <button class="action-btn btn-primary" onclick="backToOrdersList()">
+                ← Back to Orders
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('historyList').innerHTML = detailHTML;
+}
+
+// Highlight segment interaction
+function highlightSegment(segmentName) {
+    // Reset all segments
+    const allElements = document.querySelectorAll('[id^="segment-"], [id^="breakdown-"]');
+    allElements.forEach(el => {
+        if (el.id.startsWith('segment-')) {
+            el.style.opacity = '0.5';
+            el.style.transform = 'scale(1)';
+        } else if (el.id.startsWith('breakdown-')) {
+            el.style.background = 'white';
+            el.style.transform = 'scale(1)';
+        }
+    });
+    
+    // Highlight selected
+    const selectedSegment = document.getElementById(`segment-${segmentName}`);
+    const selectedBreakdown = document.getElementById(`breakdown-${segmentName}`);
+    
+    if (selectedSegment) {
+        selectedSegment.style.opacity = '1';
+        selectedSegment.style.transform = 'scaleY(1.1)';
+    }
+    
+    if (selectedBreakdown) {
+        selectedBreakdown.style.background = '#f0f4ff';
+        selectedBreakdown.style.transform = 'scale(1.02)';
+    }
+    
+    // Auto-reset after 2 seconds
+    setTimeout(() => {
+        allElements.forEach(el => {
+            if (el.id.startsWith('segment-')) {
+                el.style.opacity = '1';
+                el.style.transform = 'scale(1)';
+            } else if (el.id.startsWith('breakdown-')) {
+                el.style.background = 'white';
+                el.style.transform = 'scale(1)';
+            }
+        });
+    }, 2000);
+}
+
+// Back to orders list
+function backToOrdersList() {
+    displayHistory();
+}
+// Update stats based on selected period
+function updateStats() {
+    const period = document.getElementById('statsPeriod').value;
+    const statsContent = document.getElementById('statsContent');
+
+    // Get filtered trips based on period
+    const filteredTrips = filterTripsByPeriod(period);
+
+    if (filteredTrips.length === 0) {
+        statsContent.innerHTML = `
+            <div class="placeholder-page">
+                <div class="placeholder-icon">📊</div>
+                <div class="placeholder-text">No orders found for this period</div>
+            </div>
+        `;
+        return;
+    }
+
+    // Calculate stats
+    const stats = calculateStats(filteredTrips);
+
+    // Check if clickable (only for today/yesterday)
+    const isClickable = period === 'today' || period === 'yesterday';
+    const clickableStyle = isClickable ? 'cursor: pointer; transition: all 0.2s ease;' : '';
+    const clickableHover = isClickable ? 'onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.15)\';" onmouseout="this.style.transform=\'none\'; this.style.boxShadow=\'none\';"' : '';
+    const clickHandler = isClickable ? `onclick="showOrdersTimeline('${period}')"` : '';
+
+    // Display stats
+    statsContent.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <!-- Total Orders -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center; ${clickableStyle}" ${clickableHover} ${clickHandler}>
+                <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+                    Total Orders ${isClickable ? '<span style="font-size: 10px; color: #667eea;">▶ tap for details</span>' : ''}
+                </div>
+                <div style="font-size: 42px; font-weight: bold; color: #667eea;">
+                    ${stats.totalOrders}
+                </div>
+            </div>
+
+            <!-- Time Working -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center;">
+                <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+                    Time Working
+                </div>
+                <div style="font-size: 42px; font-weight: bold; color: #11998e;">
+                    ${formatTimeDisplay(stats.timeWorking)}
+                </div>
+            </div>
+
+            <!-- Average Time Per Order -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center;">
+                <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+                    Average Time Per Order
+                </div>
+                <div style="font-size: 42px; font-weight: bold; color: #f45c43;">
+                    ${formatTimeDisplay(stats.avgTimePerOrder)}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Show orders timeline view
+function showOrdersTimeline(period) {
+    const statsContent = document.getElementById('statsContent');
+    const filteredTrips = filterTripsByPeriod(period);
+
+    // Sort trips by start time
+    const sortedTrips = [...filteredTrips].sort((a, b) => {
+        const aStart = new Date(a.timestamp).getTime() - (a.durations.total * 1000);
+        const bStart = new Date(b.timestamp).getTime() - (b.durations.total * 1000);
+        return aStart - bStart;
+    });
+
+    // Calculate totals for each phase
+    const totalDriving = filteredTrips.reduce((sum, trip) => sum + trip.durations.heading, 0);
+    const totalShopping = filteredTrips.reduce((sum, trip) => sum + trip.durations.shopping, 0);
+    const totalDelivering = filteredTrips.reduce((sum, trip) => sum + trip.durations.delivering, 0);
+
+    // Timeline range: 6 AM to 11:59 PM (18 hours)
+    const startHour = 6;
+    const endHour = 24; // midnight
+    const totalMinutes = (endHour - startHour) * 60; // 1080 minutes
+
+    // Generate hour labels
+    let hourLabels = '';
+    for (let h = startHour; h <= endHour; h += 3) {
+        const displayHour = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+        const ampm = h >= 12 && h < 24 ? 'p' : 'a';
+        const leftPercent = ((h - startHour) / (endHour - startHour)) * 100;
+        hourLabels += `<div style="position: absolute; left: ${leftPercent}%; transform: translateX(-50%); font-size: 10px; color: #999;">${displayHour}${ampm}</div>`;
+    }
+
+    // Generate order bars
+    let orderBars = '';
+
+    sortedTrips.forEach((trip, index) => {
+        const endTime = new Date(trip.timestamp);
+        const startTime = new Date(endTime.getTime() - (trip.durations.total * 1000));
+
+        // Calculate position on timeline
+        const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
+        const endMinutes = endTime.getHours() * 60 + endTime.getMinutes();
+
+        // Convert to position relative to 6 AM
+        const relativeStart = startMinutes - (startHour * 60);
+        const relativeEnd = endMinutes - (startHour * 60);
+
+        // Calculate percentages
+        const leftPercent = Math.max(0, (relativeStart / totalMinutes) * 100);
+        const widthPercent = Math.max(2, ((relativeEnd - relativeStart) / totalMinutes) * 100);
+
+        // Calculate segment widths within the bar
+        const totalDuration = trip.durations.total;
+        const headingPercent = (trip.durations.heading / totalDuration) * 100;
+        const shoppingPercent = (trip.durations.shopping / totalDuration) * 100;
+        const deliveringPercent = (trip.durations.delivering / totalDuration) * 100;
+
+        // Build the segmented bar
+        const barId = `timeline-bar-${index}`;
+        const tooltipId = `timeline-tooltip-${index}`;
+
+        orderBars += `
+            <div id="${barId}"
+                 style="position: absolute; left: ${leftPercent}%; width: ${widthPercent}%; height: 24px; top: ${index * 30}px;
+                        display: flex; border-radius: 4px; overflow: hidden; cursor: pointer;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s ease;"
+                 onmouseenter="showTimelineTooltip(${index}, event)"
+                 onmouseleave="hideTimelineTooltip(${index})"
+                 onclick="showTimelineOrderDetail(${index}, '${period}')">
+                <div style="background: #667eea; width: ${headingPercent}%; height: 100%;"></div>
+                <div style="background: #11998e; width: ${shoppingPercent}%; height: 100%;"></div>
+                <div style="background: #f45c43; width: ${deliveringPercent}%; height: 100%;"></div>
+            </div>
+            <div id="${tooltipId}"
+                 style="display: none; position: absolute; left: ${leftPercent}%; top: ${index * 30 - 75}px;
+                        background: white; border-radius: 8px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        z-index: 100; min-width: 180px; font-size: 11px;">
+                <div style="font-weight: bold; margin-bottom: 6px; color: #333;">
+                    ${trip.orderCount} Order${trip.orderCount > 1 ? 's' : ''} • ${formatTimeDisplay(trip.durations.total)}
+                </div>
+                <div style="display: flex; height: 16px; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                    <div style="background: #667eea; width: ${headingPercent}%;"></div>
+                    <div style="background: #11998e; width: ${shoppingPercent}%;"></div>
+                    <div style="background: #f45c43; width: ${deliveringPercent}%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #666; font-size: 10px;">
+                    <span>🚗 ${formatTimeDisplay(trip.durations.heading)}</span>
+                    <span>🛒 ${formatTimeDisplay(trip.durations.shopping)}</span>
+                    <span>📦 ${formatTimeDisplay(trip.durations.delivering)}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    // Calculate required height based on number of orders
+    const timelineHeight = Math.max(80, sortedTrips.length * 30);
+
+    statsContent.innerHTML = `
+        <div>
+            <!-- Phase Totals -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+                <div style="background: #667eea; color: white; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Driving to Store</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDriving)}</div>
+                </div>
+                <div style="background: #11998e; color: white; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Shopping</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalShopping)}</div>
+                </div>
+                <div style="background: #f45c43; color: white; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Delivering</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDelivering)}</div>
+                </div>
+            </div>
+
+            <!-- Timeline Container -->
+            <div style="background: #f8f9fa; border-radius: 10px; padding: 12px; position: relative;">
+                <!-- Hour labels -->
+                <div style="position: relative; height: 18px; margin-bottom: 5px;">
+                    ${hourLabels}
+                </div>
+
+                <!-- Timeline grid lines -->
+                <div style="position: relative; height: ${timelineHeight}px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">
+                    <!-- Vertical grid lines every 3 hours -->
+                    ${Array.from({length: 7}, (_, i) => {
+                        const leftPercent = (i * 3 / 18) * 100;
+                        return `<div style="position: absolute; left: ${leftPercent}%; top: 0; bottom: 0; border-left: 1px dashed #e0e0e0;"></div>`;
+                    }).join('')}
+
+                    <!-- Order bars -->
+                    ${orderBars}
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div style="text-align: center; margin-top: 12px;">
+                <span onclick="updateStats()" style="color: #667eea; font-size: 13px; cursor: pointer;">← Back</span>
+            </div>
+        </div>
+    `;
+}
+
+// Show tooltip on hover
+function showTimelineTooltip(index, event) {
+    const tooltip = document.getElementById(`timeline-tooltip-${index}`);
+    const bar = document.getElementById(`timeline-bar-${index}`);
+    if (tooltip && bar) {
+        tooltip.style.display = 'block';
+        bar.style.transform = 'scaleY(1.1)';
+        bar.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    }
+}
+
+// Hide tooltip
+function hideTimelineTooltip(index) {
+    const tooltip = document.getElementById(`timeline-tooltip-${index}`);
+    const bar = document.getElementById(`timeline-bar-${index}`);
+    if (tooltip && bar) {
+        tooltip.style.display = 'none';
+        bar.style.transform = 'none';
+        bar.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    }
+}
+
+// Show detailed order view from timeline
+function showTimelineOrderDetail(index, period) {
+    const filteredTrips = filterTripsByPeriod(period);
+    const sortedTrips = [...filteredTrips].sort((a, b) => {
+        const aStart = new Date(a.timestamp).getTime() - (a.durations.total * 1000);
+        const bStart = new Date(b.timestamp).getTime() - (b.durations.total * 1000);
+        return aStart - bStart;
+    });
+
+    const trip = sortedTrips[index];
+
+    // Find this trip in the main tripHistory to get its actual index
+    const historyIndex = tripHistory.findIndex(t =>
+        t.timestamp.getTime() === trip.timestamp.getTime() &&
+        t.durations.total === trip.durations.total
+    );
+
+    if (historyIndex !== -1) {
+        showPage('history');
+        setTimeout(() => showOrderDetail(historyIndex), 100);
+    }
+}
+
+// Filter trips by time period
+function filterTripsByPeriod(period) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Start of today
+    
+    return tripHistory.filter(trip => {
+        const tripDate = new Date(trip.timestamp);
+        
+        switch(period) {
+            case 'today':
+                // Only today (Feb 3, 2026)
+                return tripDate >= today;
+            
+            case 'yesterday':
+                // Only yesterday (Feb 2, 2026)
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const dayBeforeYesterday = new Date(yesterday);
+                dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
+                return tripDate >= dayBeforeYesterday && tripDate < yesterday;
+            
+            case 'thisWeek':
+                // Since nearest Monday (Feb 2, 2026)
+                // Find the most recent Monday
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // If Sunday, go back 6 days
+                const thisMonday = new Date(today);
+                thisMonday.setDate(thisMonday.getDate() - daysToMonday);
+                return tripDate >= thisMonday;
+            
+            case 'thisMonth':
+                // Since Feb 1, 2026
+                const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                return tripDate >= firstOfMonth;
+            
+            case 'allTime':
+                // Everything
+                return true;
+            
+            case 'custom':
+                // TODO: Implement custom date range
+                return true;
+            
+            default:
+                return true;
+        }
+    });
+}
+
+// Calculate statistics from filtered trips
+function calculateStats(trips) {
+    // Total orders (sum of all individual deliveries)
+    const totalOrders = trips.reduce((sum, trip) => sum + trip.orderCount, 0);
+    
+    // Time working (sum of all trip durations)
+    const timeWorking = trips.reduce((sum, trip) => sum + trip.durations.total, 0);
+    
+    // Average time per order
+    const avgTimePerOrder = totalOrders > 0 ? Math.floor(timeWorking / totalOrders) : 0;
+    
+    return {
+        totalOrders,
+        timeWorking,
+        avgTimePerOrder
+    };
+}
+        // Helper: Format time for compact display (e.g. "16 min" or "1 hr 05 min")
+        function formatTimeDisplay(seconds) {
+            const totalMinutes = Math.floor(seconds / 60);
+            
+            if (totalMinutes > 360) {
+                return "You took too long - 0 stars";
+            }
+            
+            const hours = Math.floor(totalMinutes / 60);
+            const mins = totalMinutes % 60;
+            
+            if (hours === 0) {
+                return `${mins} min`;
+            } else {
+                return `${hours} hr ${String(mins).padStart(2, '0')} min`;
+            }
+        }
+
+        // Helper: Format date compactly (e.g. "Feb 3, 10:14 PM")
+        function formatCompactDate(date) {
+            const d = new Date(date);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const month = months[d.getMonth()];
+            const day = d.getDate();
+            const hours = d.getHours();
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            
+            return `${month} ${day}, ${displayHours}:${minutes} ${ampm}`;
+        }
+        // Helper: Format date compactly (e.g. "Feb 3, 10:14 PM")
+function formatCompactDate(date) {
+    const d = new Date(date);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[d.getMonth()];
+    const day = d.getDate();
+    const hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    
+    return `${month} ${day}, ${displayHours}:${minutes} ${ampm}`;
+}
+
+// Helper: Format date for detail view (e.g. "Feb 3, 10:40 AM")
+function formatDetailDate(date) {
+    const d = new Date(date);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[d.getMonth()];
+    const day = d.getDate();
+    const hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    
+    return `${month} ${day}, ${displayHours}:${minutes} ${ampm}`;
+}
+
+        // Load history on page load
+        window.addEventListener('load', () => {
+            fetch('/api/orders')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.orders) {
+                        tripHistory = data.orders.map(trip => ({
+                            ...trip,
+                            timestamp: new Date(trip.timestamp)
+                        }));
+                        displayHistory();
+                    }
+                })
+                .catch(error => console.error('Error loading history:', error));
+        });
+    </script>
+</body>
+</html>
