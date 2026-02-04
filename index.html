@@ -5,6 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shipt Delivery Tracker</title>
     <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            /* Primary palette - refined purple/indigo */
+            --primary-50: #f0f1ff;
+            --primary-100: #e0e4ff;
+            --primary-200: #c7cdfe;
+            --primary-300: #a4acfc;
+            --primary-400: #818cf8;
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            --primary-800: #3730a3;
+            --primary-900: #312e81;
+
+            /* Success palette - teal/emerald */
+            --success-50: #ecfdf5;
+            --success-100: #d1fae5;
+            --success-200: #a7f3d0;
+            --success-300: #6ee7b7;
+            --success-400: #34d399;
+            --success-500: #10b981;
+            --success-600: #059669;
+            --success-700: #047857;
+
+            /* Danger palette - rose/red */
+            --danger-50: #fff1f2;
+            --danger-100: #ffe4e6;
+            --danger-200: #fecdd3;
+            --danger-300: #fda4af;
+            --danger-400: #fb7185;
+            --danger-500: #f43f5e;
+            --danger-600: #e11d48;
+            --danger-700: #be123c;
+
+            /* Neutral palette */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            --gradient-danger: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6366f1 100%);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-glow-primary: 0 0 20px rgba(99, 102, 241, 0.3);
+            --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.3);
+
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -12,56 +94,75 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--gradient-bg);
+            background-attachment: fixed;
             min-height: 100vh;
             padding: 0;
+            color: var(--gray-800);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Burger Menu */
+        /* ===== BURGER MENU ===== */
         .burger-menu {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: var(--space-md);
+            left: var(--space-md);
             z-index: 1000;
             cursor: pointer;
-            background: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            gap: 5px;
+            box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+            transition: all var(--transition-normal);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .burger-menu:hover {
             transform: scale(1.05);
+            box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
+        }
+
+        .burger-menu:active {
+            transform: scale(0.98);
         }
 
         .burger-line {
-            width: 25px;
-            height: 3px;
-            background: #667eea;
-            border-radius: 2px;
-            transition: all 0.3s ease;
+            width: 22px;
+            height: 2.5px;
+            background: var(--primary-600);
+            border-radius: var(--radius-full);
+            transition: all var(--transition-normal);
         }
 
-        /* Side Menu */
+        .burger-menu:hover .burger-line {
+            background: var(--primary-700);
+        }
+
+        /* ===== SIDE MENU ===== */
         .side-menu {
             position: fixed;
             top: 0;
-            left: -300px;
+            left: -320px;
             width: 300px;
             height: 100vh;
-            background: white;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-xl);
             z-index: 999;
-            transition: left 0.3s ease;
-            padding-top: 80px;
+            transition: left var(--transition-slow);
+            padding-top: 90px;
+            border-right: 1px solid var(--gray-100);
         }
 
         .side-menu.open {
@@ -69,219 +170,277 @@
         }
 
         .menu-item {
-            padding: 20px 30px;
-            font-size: 18px;
-            color: #333;
+            padding: var(--space-lg) var(--space-xl);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--gray-700);
             cursor: pointer;
-            transition: all 0.2s ease;
-            border-left: 4px solid transparent;
+            transition: all var(--transition-fast);
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
         }
 
         .menu-item:hover {
-            background: #f8f9fa;
-            border-left-color: #667eea;
+            background: var(--primary-50);
+            border-left-color: var(--primary-400);
+            color: var(--primary-700);
         }
 
         .menu-item.active {
-            background: #f8f9fa;
-            border-left-color: #667eea;
-            font-weight: bold;
-            color: #667eea;
+            background: var(--primary-50);
+            border-left-color: var(--primary-600);
+            font-weight: 600;
+            color: var(--primary-700);
         }
 
-        /* Overlay */
+        /* ===== OVERLAY ===== */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 998;
-            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
         }
 
         .overlay.show {
-            display: block;
+            opacity: 1;
+            visibility: visible;
         }
 
-        /* Main Container */
+        /* ===== MAIN CONTAINER ===== */
         .container {
-            max-width: 500px;
+            max-width: 480px;
             margin: 0 auto;
             background: white;
             min-height: 100vh;
-            padding: 30px;
-            padding-top: 40px;
+            padding: var(--space-xl);
+            padding-top: var(--space-2xl);
+            box-shadow: var(--shadow-xl);
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
+            color: var(--gray-900);
+            margin-bottom: var(--space-xl);
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        /* Pages */
+        /* ===== PAGES ===== */
         .page {
             display: none;
+            animation: fadeIn var(--transition-normal) ease-out;
         }
 
         .page.active {
             display: block;
         }
 
-        /* Order Counter */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== ORDER COUNTER ===== */
         .order-counter {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
             text-align: center;
+            border: 1px solid var(--gray-100);
         }
 
         .counter-label {
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
+            letter-spacing: 1.5px;
+            margin-bottom: var(--space-md);
         }
 
         .counter-controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: var(--space-xl);
         }
 
         .counter-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
             border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 26px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .counter-btn:hover {
-            transform: scale(1.1);
+        .counter-btn:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+        }
+
+        .counter-btn:active:not(:disabled) {
+            transform: scale(0.95);
         }
 
         .counter-btn:disabled {
-            background: #ccc;
+            background: var(--gray-200);
+            color: var(--gray-400);
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .counter-value {
-            font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 52px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             min-width: 80px;
         }
 
-        /* Timer Display */
+        /* ===== TIMER DISPLAY ===== */
         .timer-display {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
             text-align: center;
+            border: 1px solid var(--gray-100);
         }
 
         .timer-label {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            margin-bottom: var(--space-sm);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .timer-value {
-            font-size: 36px;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 42px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
         }
 
-        /* Status Display */
+        /* ===== STATUS DISPLAY ===== */
         .status-display {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: var(--gradient-success);
             color: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
             text-align: center;
+            box-shadow: var(--shadow-md), var(--shadow-glow-success);
         }
 
         .status-text {
             font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
         }
 
         .status-subtext {
             font-size: 14px;
             opacity: 0.9;
+            font-weight: 500;
         }
 
-        /* Buttons */
+        /* ===== BUTTONS ===== */
         button.action-btn {
             width: 100%;
-            padding: 18px;
+            padding: var(--space-lg);
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 15px;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-md);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
         }
 
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: var(--gradient-success);
             color: white;
         }
 
         .btn-success:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg), var(--shadow-glow-success);
+        }
+
+        .btn-success:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            background: var(--gradient-danger);
             color: white;
         }
 
         .btn-danger:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(235, 51, 73, 0.4);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-danger:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
+            box-shadow: none !important;
         }
 
-        /* Modal */
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -289,90 +448,103 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
         }
 
         .modal.show {
             display: flex;
+            opacity: 1;
         }
 
         .modal-content {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 350px;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 340px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.95);
+            transition: transform var(--transition-normal);
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
         }
 
         .modal-title {
             font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-md);
         }
 
         .modal-text {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.5;
+            font-size: 15px;
+            color: var(--gray-600);
+            margin-bottom: var(--space-xl);
+            line-height: 1.6;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 10px;
+            gap: var(--space-md);
         }
 
         .modal-btn {
             flex: 1;
-            padding: 15px;
+            padding: var(--space-md);
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-fast);
         }
 
         .modal-btn-cancel {
-            background: #ff4444;
-            color: white;
+            background: var(--gray-100);
+            color: var(--gray-700);
         }
 
         .modal-btn-cancel:hover {
-            background: #cc0000;
-            transform: translateY(-2px);
+            background: var(--gray-200);
         }
 
         .modal-btn-confirm {
-            background: #11998e;
+            background: var(--danger-500);
             color: white;
         }
 
         .modal-btn-confirm:hover {
-            background: #0d7a6f;
+            background: var(--danger-600);
             transform: translateY(-2px);
         }
 
+        /* ===== PLACEHOLDER PAGE ===== */
         .placeholder-page {
             text-align: center;
-            padding: 60px 20px;
-            color: #999;
+            padding: var(--space-2xl) var(--space-lg);
+            color: var(--gray-400);
         }
 
         .placeholder-icon {
-            font-size: 72px;
-            margin-bottom: 20px;
+            font-size: 64px;
+            margin-bottom: var(--space-md);
+            opacity: 0.8;
         }
 
         .placeholder-text {
-            font-size: 18px;
-            font-style: italic;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--gray-500);
         }
 
         .hidden {
@@ -381,54 +553,52 @@
 
         .empty-history {
             text-align: center;
-            color: #999;
-            padding: 40px 20px;
-            font-style: italic;
+            color: var(--gray-400);
+            padding: var(--space-2xl) var(--space-lg);
+            font-size: 15px;
+            font-weight: 500;
         }
 
-        /* Compact History Item */
+        /* ===== HISTORY ITEM (PAST ORDERS) ===== */
         .history-item-compact {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
             position: relative;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: 1px solid var(--gray-100);
+            box-shadow: var(--shadow-sm);
         }
-        .history-item-compact {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 12px;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
-.history-item-compact:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
+        .history-item-compact:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-200);
+        }
 
         .delete-btn-compact {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+            top: var(--space-md);
+            right: var(--space-md);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
             border: none;
-            background: #ff4444;
-            color: white;
+            background: var(--danger-50);
+            color: var(--danger-500);
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-fast);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .delete-btn-compact:hover {
-            background: #cc0000;
+            background: var(--danger-500);
+            color: white;
             transform: scale(1.1);
         }
 
@@ -436,53 +606,236 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 15px;
-            padding-right: 35px;
+            margin-bottom: var(--space-md);
+            padding-right: 40px;
         }
 
         .compact-order-info {
-            font-size: 15px;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-600);
         }
 
         .compact-date {
-            font-size: 15px;
-            font-weight: bold;
-            color: #000;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
         }
 
         .compact-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: var(--space-sm);
         }
 
         .compact-stat-box {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
+            background: var(--gray-50);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
             text-align: center;
+            border: 1px solid var(--gray-100);
         }
 
         .compact-stat-label {
-            font-size: 11px;
-            color: #666;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .compact-stat-value {
             font-size: 18px;
-            font-weight: bold;
-            color: #333;
+            font-weight: 700;
+            color: var(--gray-800);
         }
 
         .compact-stat-value.too-long {
-            font-size: 13px;
-            color: #ff4444;
-            font-style: italic;
+            font-size: 12px;
+            color: var(--danger-500);
+            font-weight: 600;
+        }
+
+        /* ===== MESSAGE TABS ===== */
+        .messages-wrapper {
+            margin-top: var(--space-lg);
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .messages-tabs {
+            display: flex;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: var(--space-xs);
+            gap: var(--space-xs);
+        }
+
+        .messages-tab {
+            flex: 1;
+            padding: var(--space-sm) var(--space-xs);
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+        }
+
+        .messages-tab:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .messages-tab.active {
+            background: var(--primary-600);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .messages-container {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: var(--space-md);
+            display: none;
+            background: var(--gray-50);
+        }
+
+        .messages-container.active {
+            display: block;
+        }
+
+        .message-box {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-100);
+            transition: all var(--transition-fast);
+        }
+
+        .message-box:hover {
+            border-color: var(--primary-200);
+            box-shadow: var(--shadow-md);
+        }
+
+        .message-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-text {
+            font-size: 14px;
+            color: var(--gray-700);
+            line-height: 1.5;
+            padding-right: 70px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 50%;
+            right: var(--space-md);
+            transform: translateY(-50%);
+            background: var(--primary-600);
+            color: white;
+            border: none;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-700);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .copy-btn:active {
+            transform: translateY(-50%) scale(0.98);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-500);
+        }
+
+        /* ===== SCROLLBAR STYLING ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+
+        /* ===== MOBILE OPTIMIZATIONS ===== */
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--space-lg);
+                padding-top: var(--space-xl);
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-bottom: var(--space-lg);
+            }
+
+            .counter-value {
+                font-size: 44px;
+            }
+
+            .timer-value {
+                font-size: 36px;
+            }
+
+            .burger-menu {
+                top: var(--space-sm);
+                left: var(--space-sm);
+                width: 46px;
+                height: 46px;
+            }
+
+            .burger-line {
+                width: 20px;
+            }
+
+            button.action-btn {
+                padding: var(--space-md);
+                font-size: 15px;
+            }
+        }
+
+        /* ===== SELECTION STYLES ===== */
+        ::selection {
+            background: var(--primary-200);
+            color: var(--primary-900);
+        }
+
+        /* ===== FOCUS STYLES (Accessibility) ===== */
+        button:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--primary-500);
+            outline-offset: 2px;
         }
     </style>
 </head>
@@ -558,6 +911,31 @@
                 <button class="action-btn btn-primary" onclick="startHeadingToStore()" id="headToStoreBtn">
                     🚗 Head to Store
                 </button>
+                <div class="messages-wrapper">
+                    <div class="messages-tabs">
+                        <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                        <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                        <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                    </div>
+                    <div class="messages-container active" id="tab-intro">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Hi I started shopping your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-finished">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">I'm done shopping for your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-delivered">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Have a nice day :)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -592,7 +970,7 @@
     <div id="statsContent">
         <div class="placeholder-page">
             <div class="placeholder-icon">📊</div>
-            <div class="placeholder-text">Select a time period above</div>
+            <div class="placeholder-text">Loading...</div>
         </div>
     </div>
 </div>
@@ -628,6 +1006,223 @@
         let timerInterval = null;
         let tripHistory = [];
         let deleteIndex = null;
+        let useLocalStorage = false; // Will be set to true if MongoDB is unavailable
+
+        const FOUR_HOURS_MS = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+
+        // Save current trip state to localStorage
+        function saveTripState() {
+            if (tripState.phase !== 'idle') {
+                const stateToSave = {
+                    ...tripState,
+                    startTime: tripState.startTime?.getTime(),
+                    headingStartTime: tripState.headingStartTime?.getTime(),
+                    shoppingStartTime: tripState.shoppingStartTime?.getTime(),
+                    deliveringStartTime: tripState.deliveringStartTime?.getTime(),
+                    deliveryTimes: tripState.deliveryTimes.map(dt => dt.getTime()),
+                    savedAt: new Date().getTime()
+                };
+                localStorage.setItem('currentTrip', JSON.stringify(stateToSave));
+            } else {
+                localStorage.removeItem('currentTrip');
+            }
+        }
+
+        // Restore trip state from localStorage
+        function restoreTripState() {
+            try {
+                const saved = localStorage.getItem('currentTrip');
+                if (!saved) return false;
+
+                const state = JSON.parse(saved);
+                const now = new Date().getTime();
+                const savedAt = state.savedAt || state.startTime;
+
+                // Check if the saved trip is older than 4 hours
+                if (savedAt && (now - savedAt > FOUR_HOURS_MS)) {
+                    console.log('Saved trip exceeded 4-hour timeout, discarding...');
+                    localStorage.removeItem('currentTrip');
+                    return false;
+                }
+
+                // Restore the trip state
+                tripState = {
+                    ...state,
+                    startTime: state.startTime ? new Date(state.startTime) : null,
+                    headingStartTime: state.headingStartTime ? new Date(state.headingStartTime) : null,
+                    shoppingStartTime: state.shoppingStartTime ? new Date(state.shoppingStartTime) : null,
+                    deliveringStartTime: state.deliveringStartTime ? new Date(state.deliveringStartTime) : null,
+                    deliveryTimes: state.deliveryTimes.map(dt => new Date(dt))
+                };
+
+                // Restore the UI based on the phase
+                restoreUI();
+                return true;
+            } catch (error) {
+                console.error('Error restoring trip state:', error);
+                localStorage.removeItem('currentTrip');
+                return false;
+            }
+        }
+
+        // Restore UI based on saved trip state
+        function restoreUI() {
+            document.getElementById('orderCount').textContent = tripState.orderCount;
+
+            if (tripState.phase === 'heading') {
+                document.getElementById('timerLabel').textContent = 'Heading to Store';
+                document.getElementById('actionButtons').innerHTML = `
+                    <button class="action-btn btn-success" onclick="startShopping()">
+                        🛒 Start Shopping
+                    </button>
+                    <div class="messages-wrapper">
+                        <div class="messages-tabs">
+                            <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                            <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                            <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                        </div>
+                        <div class="messages-container active" id="tab-intro">
+                            <div class="message-box">
+                                <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                                <div class="message-text">Hi I started shopping your order</div>
+                            </div>
+                        </div>
+                        <div class="messages-container" id="tab-finished">
+                            <div class="message-box">
+                                <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                                <div class="message-text">I'm done shopping for your order</div>
+                            </div>
+                        </div>
+                        <div class="messages-container" id="tab-delivered">
+                            <div class="message-box">
+                                <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                                <div class="message-text">Have a nice day :)</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                startTimer();
+            } else if (tripState.phase === 'shopping') {
+                document.getElementById('timerLabel').textContent = `Shopping for ${tripState.orderCount} Order${tripState.orderCount > 1 ? 's' : ''}`;
+                document.getElementById('actionButtons').innerHTML = `
+                    <button class="action-btn btn-success" onclick="completeShopping()">
+                        ✅ Shopping Complete
+                    </button>
+                    <div class="messages-wrapper">
+                        <div class="messages-tabs">
+                            <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                            <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                            <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                        </div>
+                        <div class="messages-container active" id="tab-intro">
+                            <div class="message-box">
+                                <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                                <div class="message-text">Hi I started shopping your order</div>
+                            </div>
+                        </div>
+                        <div class="messages-container" id="tab-finished">
+                            <div class="message-box">
+                                <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                                <div class="message-text">I'm done shopping for your order</div>
+                            </div>
+                        </div>
+                        <div class="messages-container" id="tab-delivered">
+                            <div class="message-box">
+                                <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                                <div class="message-text">Have a nice day :)</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                startTimer();
+            } else if (tripState.phase === 'delivering') {
+                updateDeliveryUI();
+                startTimer();
+            }
+
+            // Only disable order count buttons during delivery phase
+            if (tripState.phase === 'delivering') {
+                document.getElementById('decreaseBtn').disabled = true;
+                document.getElementById('increaseBtn').disabled = true;
+            } else {
+                document.getElementById('decreaseBtn').disabled = false;
+                document.getElementById('increaseBtn').disabled = false;
+            }
+        }
+
+        // Storage functions with localStorage fallback
+        const storage = {
+            async saveOrder(trip) {
+                if (useLocalStorage) {
+                    const orders = JSON.parse(localStorage.getItem('shipOrders') || '[]');
+                    orders.unshift(trip);
+                    localStorage.setItem('shipOrders', JSON.stringify(orders));
+                    return { success: true };
+                }
+
+                try {
+                    const response = await fetch('/api/save-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(trip)
+                    });
+                    const data = await response.json();
+                    if (!data.success) throw new Error('Save failed');
+                    return data;
+                } catch (error) {
+                    console.log('MongoDB unavailable, switching to localStorage');
+                    useLocalStorage = true;
+                    return this.saveOrder(trip);
+                }
+            },
+
+            async loadOrders() {
+                if (useLocalStorage) {
+                    const orders = JSON.parse(localStorage.getItem('shipOrders') || '[]');
+                    return { success: true, orders };
+                }
+
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 2000); // 2 second timeout
+
+                    const response = await fetch('/api/orders', { signal: controller.signal });
+                    clearTimeout(timeout);
+
+                    const data = await response.json();
+                    if (!data.success) throw new Error('Load failed');
+                    return data;
+                } catch (error) {
+                    console.log('MongoDB unavailable, switching to localStorage');
+                    useLocalStorage = true;
+                    return this.loadOrders();
+                }
+            },
+
+            async deleteOrder(index) {
+                if (useLocalStorage) {
+                    const orders = JSON.parse(localStorage.getItem('shipOrders') || '[]');
+                    orders.splice(index, 1);
+                    localStorage.setItem('shipOrders', JSON.stringify(orders));
+                    return { success: true, orders };
+                }
+
+                try {
+                    const response = await fetch('/api/delete-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ index })
+                    });
+                    const data = await response.json();
+                    if (!data.success) throw new Error('Delete failed');
+                    return data;
+                } catch (error) {
+                    console.log('MongoDB unavailable, switching to localStorage');
+                    useLocalStorage = true;
+                    return this.deleteOrder(index);
+                }
+            }
+        };
 
         // Menu functions
         function toggleMenu() {
@@ -661,9 +1256,15 @@
             if (pages[pageName]) {
                 document.getElementById(pages[pageName].element).classList.add('active');
                 document.querySelectorAll('.menu-item')[pages[pageName].menuIndex].classList.add('active');
-                
+
                 if (pageName === 'history') {
                     displayHistory();
+                }
+
+                // Auto-show today's timeline when entering Stats page
+                if (pageName === 'stats') {
+                    document.getElementById('statsPeriod').value = 'today';
+                    setTimeout(() => showStatsView(), 50);
                 }
             }
 
@@ -682,30 +1283,24 @@
         }
 
         function confirmDelete() {
-    if (deleteIndex !== null) {
-        fetch('/api/delete-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ index: deleteIndex })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.orders) {
-                // Update local history from server
-                tripHistory = data.orders.map(trip => ({
-                    ...trip,
-                    timestamp: new Date(trip.timestamp)
-                }));
-                displayHistory();
-                closeDeleteModal();
+            if (deleteIndex !== null) {
+                storage.deleteOrder(deleteIndex)
+                    .then(data => {
+                        if (data.success && data.orders) {
+                            tripHistory = data.orders.map(trip => ({
+                                ...trip,
+                                timestamp: new Date(trip.timestamp)
+                            }));
+                            displayHistory();
+                            closeDeleteModal();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting order:', error);
+                        alert('Failed to delete order');
+                    });
             }
-        })
-        .catch(error => {
-            console.error('Error deleting order:', error);
-            alert('Failed to delete order');
-        });
-    }
-}
+        }
 
         // Order counter functions
         function changeOrderCount(delta) {
@@ -713,6 +1308,16 @@
             if (newCount >= 1 && newCount <= 6) {
                 tripState.orderCount = newCount;
                 document.getElementById('orderCount').textContent = newCount;
+
+                // Update timer label if in shopping phase
+                if (tripState.phase === 'shopping') {
+                    document.getElementById('timerLabel').textContent = `Shopping for ${newCount} Order${newCount > 1 ? 's' : ''}`;
+                }
+
+                // Save state if order is in progress
+                if (tripState.phase !== 'idle') {
+                    saveTripState();
+                }
             }
         }
 
@@ -727,9 +1332,61 @@
                 <button class="action-btn btn-success" onclick="startShopping()">
                     🛒 Start Shopping
                 </button>
+                <div class="messages-wrapper">
+                    <div class="messages-tabs">
+                        <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                        <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                        <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                    </div>
+                    <div class="messages-container active" id="tab-intro">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Hi I started shopping your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-finished">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">I'm done shopping for your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-delivered">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Have a nice day :)</div>
+                        </div>
+                    </div>
+                </div>
             `;
 
             startTimer();
+            saveTripState();
+        }
+
+        // Switch between message tabs
+        function switchMessageTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.messages-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.messages-container').forEach(container => container.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // Copy message to clipboard
+        function copyMessage(btn) {
+            const messageBox = btn.closest('.message-box');
+            const text = messageBox.querySelector('.message-text').textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         }
 
         // Phase 2: Shopping
@@ -744,9 +1401,35 @@
                 <button class="action-btn btn-success" onclick="completeShopping()">
                     ✅ Shopping Complete
                 </button>
+                <div class="messages-wrapper">
+                    <div class="messages-tabs">
+                        <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                        <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                        <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                    </div>
+                    <div class="messages-container active" id="tab-intro">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Hi I started shopping your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-finished">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">I'm done shopping for your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-delivered">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Have a nice day :)</div>
+                        </div>
+                    </div>
+                </div>
             `;
 
             resetTimer();
+            saveTripState();
         }
 
         // Phase 3: Start Deliveries
@@ -762,6 +1445,7 @@
 
             updateDeliveryUI();
             resetTimer();
+            saveTripState();
         }
 
         // Delivery tracking
@@ -779,7 +1463,33 @@
                 <button class="action-btn btn-success" onclick="completeDelivery()">
                     ✅ Delivery ${deliveryNum} Complete
                 </button>
+                <div class="messages-wrapper">
+                    <div class="messages-tabs">
+                        <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                        <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                        <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                    </div>
+                    <div class="messages-container active" id="tab-intro">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Hi I started shopping your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-finished">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">I'm done shopping for your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-delivered">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Have a nice day :)</div>
+                        </div>
+                    </div>
+                </div>
             `;
+            saveTripState();
         }
 
         function completeDelivery() {
@@ -790,6 +1500,7 @@
             if (tripState.currentDelivery <= tripState.orderCount) {
                 updateDeliveryUI();
                 resetTimer();
+                saveTripState();
             } else {
                 completeTrip();
             }
@@ -814,28 +1525,23 @@ function completeTrip() {
     }
 
     const trip = {
-        timestamp: now,
+        timestamp: now.toISOString(),
         orderCount: tripState.orderCount,
         durations: { ...tripState.durations },
-        individualDeliveries: individualDeliveryDurations  // NEW: Store individual delivery times
+        individualDeliveries: individualDeliveryDurations
     };
 
-    fetch('/api/save-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(trip)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Trip saved:', data);
-        tripHistory.unshift(trip);
-        displayHistory();
-        resetTrip();
-    })
-    .catch(error => {
-        console.error('Error saving trip:', error);
-        alert('Failed to save trip. Please try again.');
-    });
+    storage.saveOrder(trip)
+        .then(data => {
+            console.log('Trip saved:', data);
+            tripHistory.unshift({ ...trip, timestamp: now });
+            displayHistory();
+            resetTrip();
+        })
+        .catch(error => {
+            console.error('Error saving trip:', error);
+            alert('Failed to save trip. Please try again.');
+        });
 }
 
         // Timer functions
@@ -910,7 +1616,33 @@ function completeTrip() {
                 <button class="action-btn btn-primary" onclick="startHeadingToStore()">
                     🚗 Head to Store
                 </button>
+                <div class="messages-wrapper">
+                    <div class="messages-tabs">
+                        <button class="messages-tab active" onclick="switchMessageTab('intro')">Intro</button>
+                        <button class="messages-tab" onclick="switchMessageTab('finished')">Finished Shopping</button>
+                        <button class="messages-tab" onclick="switchMessageTab('delivered')">Delivered</button>
+                    </div>
+                    <div class="messages-container active" id="tab-intro">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Hi I started shopping your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-finished">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">I'm done shopping for your order</div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="tab-delivered">
+                        <div class="message-box">
+                            <button class="copy-btn" onclick="copyMessage(this)">Copy</button>
+                            <div class="message-text">Have a nice day :)</div>
+                        </div>
+                    </div>
+                </div>
             `;
+            saveTripState(); // Clear saved state since we're back to idle
         }
 
         // Display history
@@ -1143,70 +1875,216 @@ function highlightSegment(segmentName) {
 function backToOrdersList() {
     displayHistory();
 }
-// Update stats based on selected period
+// Update stats based on selected period (called when dropdown changes)
 function updateStats() {
+    showStatsView();
+}
+
+// Main function to show stats view based on selected period
+function showStatsView() {
     const period = document.getElementById('statsPeriod').value;
     const statsContent = document.getElementById('statsContent');
 
-    // Get filtered trips based on period
+    // Only Today and Yesterday are fully implemented
+    // Show "Coming soon" for other periods
+    if (period === 'thisWeek' || period === 'thisMonth' || period === 'allTime' || period === 'custom') {
+        statsContent.innerHTML = `
+            <div class="placeholder-page">
+                <div class="placeholder-icon">🚧</div>
+                <div class="placeholder-text">Coming soon...</div>
+                <div style="font-size: 14px; color: #999; margin-top: 10px;">
+                    This time period is not yet implemented.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // For Today and Yesterday, show the timeline graph directly
     const filteredTrips = filterTripsByPeriod(period);
 
     if (filteredTrips.length === 0) {
         statsContent.innerHTML = `
             <div class="placeholder-page">
                 <div class="placeholder-icon">📊</div>
-                <div class="placeholder-text">No orders found for this period</div>
+                <div class="placeholder-text">No orders found for ${period === 'today' ? 'today' : 'yesterday'}</div>
             </div>
         `;
         return;
     }
 
-    // Calculate stats
-    const stats = calculateStats(filteredTrips);
+    // Show the timeline view directly (same as showOrdersTimeline but without back button)
+    showOrdersTimelineMain(period);
+}
 
-    // Check if clickable (only for today/yesterday)
-    const isClickable = period === 'today' || period === 'yesterday';
-    const clickableStyle = isClickable ? 'cursor: pointer; transition: all 0.2s ease;' : '';
-    const clickableHover = isClickable ? 'onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.15)\';" onmouseout="this.style.transform=\'none\'; this.style.boxShadow=\'none\';"' : '';
-    const clickHandler = isClickable ? `onclick="showOrdersTimeline('${period}')"` : '';
+// Show orders timeline as the main view (for Today/Yesterday)
+function showOrdersTimelineMain(period) {
+    const statsContent = document.getElementById('statsContent');
+    const filteredTrips = filterTripsByPeriod(period);
 
-    // Display stats
+    // Sort trips by start time
+    const sortedTrips = [...filteredTrips].sort((a, b) => {
+        const aStart = new Date(a.timestamp).getTime() - (a.durations.total * 1000);
+        const bStart = new Date(b.timestamp).getTime() - (b.durations.total * 1000);
+        return aStart - bStart;
+    });
+
+    // Calculate totals for each phase
+    const totalDriving = filteredTrips.reduce((sum, trip) => sum + trip.durations.heading, 0);
+    const totalShopping = filteredTrips.reduce((sum, trip) => sum + trip.durations.shopping, 0);
+    const totalDelivering = filteredTrips.reduce((sum, trip) => sum + trip.durations.delivering, 0);
+    const totalTime = totalDriving + totalShopping + totalDelivering;
+    const totalOrders = filteredTrips.reduce((sum, trip) => sum + trip.orderCount, 0);
+
+    // Timeline range: 6 AM to 11:59 PM (18 hours)
+    const startHour = 6;
+    const endHour = 24; // midnight
+    const totalMinutes = (endHour - startHour) * 60; // 1080 minutes
+
+    // Generate hour labels
+    let hourLabels = '';
+    for (let h = startHour; h <= endHour; h += 3) {
+        const displayHour = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+        const ampm = h >= 12 && h < 24 ? 'p' : 'a';
+        const leftPercent = ((h - startHour) / (endHour - startHour)) * 100;
+        hourLabels += `<div style="position: absolute; left: ${leftPercent}%; transform: translateX(-50%); font-size: 10px; color: #999;">${displayHour}${ampm}</div>`;
+    }
+
+    // Generate order bars
+    let orderBars = '';
+
+    sortedTrips.forEach((trip, index) => {
+        const endTime = new Date(trip.timestamp);
+        const startTime = new Date(endTime.getTime() - (trip.durations.total * 1000));
+
+        // Calculate position on timeline
+        const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
+        const endMinutes = endTime.getHours() * 60 + endTime.getMinutes();
+
+        // Convert to position relative to 6 AM
+        const relativeStart = startMinutes - (startHour * 60);
+        const relativeEnd = endMinutes - (startHour * 60);
+
+        // Calculate percentages
+        const leftPercent = Math.max(0, (relativeStart / totalMinutes) * 100);
+        const widthPercent = Math.max(2, ((relativeEnd - relativeStart) / totalMinutes) * 100);
+
+        // Calculate segment widths within the bar
+        const totalDuration = trip.durations.total;
+        const headingPercent = (trip.durations.heading / totalDuration) * 100;
+        const shoppingPercent = (trip.durations.shopping / totalDuration) * 100;
+        const deliveringPercent = (trip.durations.delivering / totalDuration) * 100;
+
+        // Build the segmented bar
+        const barId = `timeline-bar-${index}`;
+        const tooltipId = `timeline-tooltip-${index}`;
+
+        orderBars += `
+            <div id="${barId}"
+                 style="position: absolute; left: ${leftPercent}%; width: ${widthPercent}%; height: 24px; top: ${index * 30}px;
+                        display: flex; border-radius: 4px; overflow: hidden; cursor: pointer;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s ease;"
+                 onmouseenter="showTimelineTooltip(${index}, event)"
+                 onmouseleave="hideTimelineTooltip(${index})"
+                 onclick="showTimelineOrderDetail(${index}, '${period}')">
+                <div style="background: #667eea; width: ${headingPercent}%; height: 100%;"></div>
+                <div style="background: #11998e; width: ${shoppingPercent}%; height: 100%;"></div>
+                <div style="background: #f45c43; width: ${deliveringPercent}%; height: 100%;"></div>
+            </div>
+            <div id="${tooltipId}"
+                 style="display: none; position: absolute; left: ${leftPercent}%; top: ${index * 30 - 75}px;
+                        background: white; border-radius: 8px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        z-index: 100; min-width: 180px; font-size: 11px;">
+                <div style="font-weight: bold; margin-bottom: 6px; color: #333;">
+                    ${trip.orderCount} Order${trip.orderCount > 1 ? 's' : ''} - ${formatTimeDisplay(trip.durations.total)}
+                </div>
+                <div style="display: flex; height: 16px; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                    <div style="background: #667eea; width: ${headingPercent}%;"></div>
+                    <div style="background: #11998e; width: ${shoppingPercent}%;"></div>
+                    <div style="background: #f45c43; width: ${deliveringPercent}%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #666; font-size: 10px;">
+                    <span>Drive ${formatTimeDisplay(trip.durations.heading)}</span>
+                    <span>Shop ${formatTimeDisplay(trip.durations.shopping)}</span>
+                    <span>Deliver ${formatTimeDisplay(trip.durations.delivering)}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    // Calculate required height based on number of orders
+    const timelineHeight = Math.max(80, sortedTrips.length * 30);
+
     statsContent.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <!-- Total Orders -->
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center; ${clickableStyle}" ${clickableHover} ${clickHandler}>
-                <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
-                    Total Orders ${isClickable ? '<span style="font-size: 10px; color: #667eea;">▶ tap for details</span>' : ''}
+        <div>
+            <!-- Summary Stats Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; padding: 15px; text-align: center;">
+                    <div style="font-size: 11px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Total Orders</div>
+                    <div style="font-size: 28px; font-weight: bold; margin-top: 5px;">${totalOrders}</div>
                 </div>
-                <div style="font-size: 42px; font-weight: bold; color: #667eea;">
-                    ${stats.totalOrders}
-                </div>
-            </div>
-
-            <!-- Time Working -->
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center;">
-                <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
-                    Time Working
-                </div>
-                <div style="font-size: 42px; font-weight: bold; color: #11998e;">
-                    ${formatTimeDisplay(stats.timeWorking)}
+                <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 10px; padding: 15px; text-align: center;">
+                    <div style="font-size: 11px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Time Working</div>
+                    <div style="font-size: 28px; font-weight: bold; margin-top: 5px;">${formatTimeDisplay(totalTime, false)}</div>
                 </div>
             </div>
 
-            <!-- Average Time Per Order -->
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center;">
-                <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
-                    Average Time Per Order
+            <!-- Phase Totals -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+                <div style="background: #667eea; color: white; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Driving</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDriving, false)}</div>
                 </div>
-                <div style="font-size: 42px; font-weight: bold; color: #f45c43;">
-                    ${formatTimeDisplay(stats.avgTimePerOrder)}
+                <div style="background: #11998e; color: white; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Shopping</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalShopping, false)}</div>
+                </div>
+                <div style="background: #f45c43; color: white; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Delivering</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDelivering, false)}</div>
+                </div>
+            </div>
+
+            <!-- Timeline Container -->
+            <div style="background: #f8f9fa; border-radius: 10px; padding: 12px; position: relative;">
+                <!-- Hour labels -->
+                <div style="position: relative; height: 18px; margin-bottom: 5px;">
+                    ${hourLabels}
+                </div>
+
+                <!-- Timeline grid lines -->
+                <div style="position: relative; height: ${timelineHeight}px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">
+                    <!-- Vertical grid lines every 3 hours -->
+                    ${Array.from({length: 7}, (_, i) => {
+                        const leftPercent = (i * 3 / 18) * 100;
+                        return `<div style="position: absolute; left: ${leftPercent}%; top: 0; bottom: 0; border-left: 1px dashed #e0e0e0;"></div>`;
+                    }).join('')}
+
+                    <!-- Order bars -->
+                    ${orderBars}
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 12px; font-size: 11px; color: #666;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <div style="width: 12px; height: 12px; background: #667eea; border-radius: 2px;"></div>
+                    <span>Driving</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <div style="width: 12px; height: 12px; background: #11998e; border-radius: 2px;"></div>
+                    <span>Shopping</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <div style="width: 12px; height: 12px; background: #f45c43; border-radius: 2px;"></div>
+                    <span>Delivering</span>
                 </div>
             </div>
         </div>
     `;
 }
 
-// Show orders timeline view
+// Show orders timeline view (legacy - kept for compatibility)
 function showOrdersTimeline(period) {
     const statsContent = document.getElementById('statsContent');
     const filteredTrips = filterTripsByPeriod(period);
@@ -1308,15 +2186,15 @@ function showOrdersTimeline(period) {
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px;">
                 <div style="background: #667eea; color: white; border-radius: 8px; padding: 12px; text-align: center;">
                     <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Driving to Store</div>
-                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDriving)}</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDriving, false)}</div>
                 </div>
                 <div style="background: #11998e; color: white; border-radius: 8px; padding: 12px; text-align: center;">
                     <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Shopping</div>
-                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalShopping)}</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalShopping, false)}</div>
                 </div>
                 <div style="background: #f45c43; color: white; border-radius: 8px; padding: 12px; text-align: center;">
                     <div style="font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Delivering</div>
-                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDelivering)}</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${formatTimeDisplay(totalDelivering, false)}</div>
                 </div>
             </div>
 
@@ -1460,16 +2338,17 @@ function calculateStats(trips) {
     };
 }
         // Helper: Format time for compact display (e.g. "16 min" or "1 hr 05 min")
-        function formatTimeDisplay(seconds) {
+        // Set showTooLongWarning to false for aggregate stats that can legitimately exceed 6 hours
+        function formatTimeDisplay(seconds, showTooLongWarning = true) {
             const totalMinutes = Math.floor(seconds / 60);
-            
-            if (totalMinutes > 360) {
+
+            if (showTooLongWarning && totalMinutes > 360) {
                 return "You took too long - 0 stars";
             }
-            
+
             const hours = Math.floor(totalMinutes / 60);
             const mins = totalMinutes % 60;
-            
+
             if (hours === 0) {
                 return `${mins} min`;
             } else {
@@ -1520,8 +2399,10 @@ function formatDetailDate(date) {
 
         // Load history on page load
         window.addEventListener('load', () => {
-            fetch('/api/orders')
-                .then(response => response.json())
+            // Restore any in-progress trip from localStorage
+            restoreTripState();
+
+            storage.loadOrders()
                 .then(data => {
                     if (data.success && data.orders) {
                         tripHistory = data.orders.map(trip => ({
@@ -1529,6 +2410,10 @@ function formatDetailDate(date) {
                             timestamp: new Date(trip.timestamp)
                         }));
                         displayHistory();
+                        // Refresh stats view if stats page is active
+                        if (document.getElementById('statsPage').classList.contains('active')) {
+                            showStatsView();
+                        }
                     }
                 })
                 .catch(error => console.error('Error loading history:', error));
