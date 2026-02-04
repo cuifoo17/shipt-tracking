@@ -1,76 +1,106 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Store orders in memory (will add file storage next)
-let orders = [];
+// Connect to MongoDB
+const mongoUrl = process.env.MONGO_URL || process.env.MONGODB_URL || 'mongodb://localhost:27017/shipt-tracking';
+mongoose.connect(mongoUrl)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+// Order Schema
+const orderSchema = new mongoose.Schema({
+    timestamp: { type: Date, required: true },
+    orderCount: { type: Number, required: true },
+    durations: {
+        heading: Number,
+        shopping: Number,
+        delivering: Number,
+        total: Number
+    },
+    individualDeliveries: [Number]
+}, { timestamps: true });
+
+const Order = mongoose.model('Order', orderSchema);
 
 // Save a new order
-app.post('/api/save-order', (req, res) => {
+app.post('/api/save-order', async (req, res) => {
     try {
-        const order = req.body;
-        orders.unshift(order); // Add to beginning
-        
+        const orderData = req.body;
+        const order = new Order(orderData);
+        await order.save();
+
         console.log('Order saved:', {
             time: new Date(order.timestamp).toLocaleString(),
             total: formatDuration(order.durations.total)
         });
-        
-        res.json({ 
-            success: true, 
-            message: 'Order saved successfully' 
+
+        res.json({
+            success: true,
+            message: 'Order saved successfully'
         });
     } catch (error) {
         console.error('Error saving order:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to save order' 
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save order'
         });
     }
 });
 
 // Get all orders
-app.get('/api/orders', (req, res) => {
-    res.json({ 
-        success: true, 
-        orders: orders 
-    });
+app.get('/api/orders', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ timestamp: -1 });
+        res.json({
+            success: true,
+            orders: orders
+        });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch orders'
+        });
+    }
 });
 
 // Delete an order
-app.post('/api/delete-order', (req, res) => {
+app.post('/api/delete-order', async (req, res) => {
     try {
         const { index } = req.body;
-        
-        console.log('Delete request received for index:', index);
-        console.log('Current orders count:', orders.length);
-        
+
+        // Get all orders sorted by timestamp descending (newest first)
+        const orders = await Order.find().sort({ timestamp: -1 });
+
         if (typeof index !== 'number' || index < 0 || index >= orders.length) {
-            console.log('Invalid index');
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Invalid index' 
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid index'
             });
         }
-        
-        // Delete the order
-        const deleted = orders.splice(index, 1);
+
+        // Delete the order by its _id
+        await Order.findByIdAndDelete(orders[index]._id);
+
+        // Get updated list
+        const updatedOrders = await Order.find().sort({ timestamp: -1 });
+
         console.log('Order deleted successfully');
-        console.log('Remaining orders:', orders.length);
-        
-        // Send back updated list
-        res.json({ 
-            success: true, 
-            orders: orders 
+
+        res.json({
+            success: true,
+            orders: updatedOrders
         });
-        
+
     } catch (error) {
         console.error('Error deleting order:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             error: 'Failed to delete order',
             details: error.message
         });
@@ -86,8 +116,8 @@ function formatDuration(seconds) {
 }
 
 // Start server
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Shipt Tracker running on http://localhost:${PORT}`);
+    console.log(`Shipt Tracker running on port ${PORT}`);
     console.log('Press Ctrl+C to stop');
 });
