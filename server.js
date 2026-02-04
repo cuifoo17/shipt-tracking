@@ -117,7 +117,6 @@ function formatDuration(seconds) {
 
 // Start server
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Shipt Tracker running on port ${PORT}`);
-    console.log('Press Ctrl+C to stop');
 });
