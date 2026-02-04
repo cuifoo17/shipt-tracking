@@ -120,7 +120,13 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`Shipt Tracker running on port ${PORT}`);
 
     // Connect to MongoDB after server starts
-    const mongoUrl = process.env.MONGO_URL || process.env.MONGODB_URL || 'mongodb://localhost:27017/shipt-tracking';
+    let mongoUrl = process.env.MONGO_URL || process.env.MONGODB_URL || 'mongodb://localhost:27017/shipt-tracking';
+
+    // Add authSource if not present and using Railway MongoDB
+    if (mongoUrl.includes('railway') && !mongoUrl.includes('authSource')) {
+        mongoUrl = mongoUrl + '/shipt-tracking?authSource=admin';
+    }
+
     console.log('Connecting to MongoDB...');
 
     mongoose.connect(mongoUrl)
